@@ -26,8 +26,8 @@ def get_next_run_dir(base_dir="logs"):
     return run_dir
 
 # SCENE_DIR = "/home/lburel/Sofa/plugins/BeamAdapter/examples"
-SCENE_DIR = "/home/lburel/Sofa/plugins/SofaPython3/examples"
-# SCENE_DIR = "/home/lburel/Sofa/src/examples"
+# SCENE_DIR = "/home/lburel/Sofa/plugins/SofaPython3/examples"
+SCENE_DIR = "/home/lburel/Sofa/src/examples"
 RUN_FEATURE = "/home/lburel/Sofa/plugins/SofaPython3/examples/LoaderScene_snapshot.py"
 MAX_WORKERS = 16
 TIMEOUT = 30

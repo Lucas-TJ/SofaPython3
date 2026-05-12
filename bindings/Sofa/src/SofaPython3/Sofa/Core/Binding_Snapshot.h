@@ -38,6 +38,10 @@ public :
         m_snapshots.push_back(snapshot);
     }
 
+    int getNumberOfSnapshot() const {
+        return m_snapshots.size();
+    }
+
 };
 
 void moduleAddSnapshot(pybind11::module &m);

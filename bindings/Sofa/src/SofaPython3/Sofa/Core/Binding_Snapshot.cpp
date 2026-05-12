@@ -39,6 +39,7 @@ namespace sofapython3 {
         py::class_<Snapshot_Python>(m, "Snapshot_Python")
         .def(py::init<>())
         .def("push_back", &sofapython3::Snapshot_Python::push_back)
+        .def("getNumberOfSnapshot",&Snapshot_Python::getNumberOfSnapshot)
         .def_readwrite("m_snapshots", &Snapshot_Python::m_snapshots);
     }
 }

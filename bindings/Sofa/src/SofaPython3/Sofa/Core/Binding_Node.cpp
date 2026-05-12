@@ -42,11 +42,9 @@ using sofa::core::objectmodel::Snapshot;
 #include <sofa/simulation/SaveSnapshotVisitor.h>
 using sofa::simulation::SaveSnapshotVisitor;
 
-#include <sofa/simulation/LoadDataSnapshotVisitor.h>
-using sofa::simulation::LoadDataSnapshotVisitor;
+#include <sofa/simulation/LoadSnapshotVisitor.h>
+using sofa::simulation::LoadSnapshotVisitor;
 
-#include <sofa/simulation/LoadLinkSnapshotVisitor.h>
-using sofa::simulation::LoadLinkSnapshotVisitor;
 
 #include <SofaPython3/Sofa/Core/Binding_Snapshot.h>
 using sofapython3::Snapshot_Python;
@@ -695,10 +693,9 @@ void executeLoadSnapshotVisitor(Node* self, Snapshot_Python& snapshot, sofa::Ind
 {
     auto m_loadedsnapshot = std::make_shared<sofa::core::objectmodel::Snapshot>();
 
-    auto visitor = LoadDataSnapshotVisitor(nullptr,*snapshot.m_snapshots[index]);
+    auto visitor = LoadSnapshotVisitor(nullptr,*snapshot.m_snapshots[index]);
     self->execute(visitor);
-    auto linkvisitor = LoadLinkSnapshotVisitor(nullptr, *snapshot.m_snapshots[index]);
-    self->execute(linkvisitor);
+
 }
 
 py::object computeEnergy(Node* self)
