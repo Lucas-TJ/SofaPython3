@@ -19,10 +19,12 @@ set(EXAMPLES_FILES
     ${CMAKE_CURRENT_SOURCE_DIR}/keyEvents.py
     ${CMAKE_CURRENT_SOURCE_DIR}/liver.py
     ${CMAKE_CURRENT_SOURCE_DIR}/liver-scriptcontroller.py
+    ${CMAKE_CURRENT_SOURCE_DIR}/LoaderScene_snapshot.py
     ${CMAKE_CURRENT_SOURCE_DIR}/loadXMLfromPython.py
     ${CMAKE_CURRENT_SOURCE_DIR}/pointSetTopologyModifier.py
     ${CMAKE_CURRENT_SOURCE_DIR}/ReadTheDocs_Example.py
     ${CMAKE_CURRENT_SOURCE_DIR}/springForceField.py
+    ${CMAKE_CURRENT_SOURCE_DIR}/Snapshot_test.py
 
 )
 
