@@ -43,7 +43,7 @@ using namespace pybind11::literals;
 
 namespace sofapython3
 {
-    using sofa::core::objectmodel::BaseObject;
+    using sofa::core::objectmodel::BaseComponent;
     using sofa::core::objectmodel::ComponentState;
     using sofa::core::behavior::MechanicalState;
     using sofa::core::MechanicalParams;
@@ -121,7 +121,6 @@ namespace sofapython3
     template<class TDOFType>
     py::object ForceField_Trampoline<TDOFType>::_addKToMatrix(const MechanicalParams* mparams, int nIndices, int nDofs)
     {
-        PythonEnvironment::gil acquire;
 
         py::dict mp = py::dict("time"_a=getContext()->getTime(),
                                "mFactor"_a=mparams->mFactor(),
@@ -136,6 +135,8 @@ namespace sofapython3
     template<class TDOFType>
     void ForceField_Trampoline<TDOFType>::addKToMatrix(const MechanicalParams* mparams, const MultiMatrixAccessor* dfId)
     {
+        PythonEnvironment::gil acquire;
+        
         MultiMatrixAccessor::MatrixRef mref = dfId->getMatrix(this->mstate);
         sofa::linearalgebra::BaseMatrix* mat = mref.matrix;
 
@@ -186,7 +187,7 @@ namespace sofapython3
     template<class TDOFType>
     void declare_forcefield(py::module &m) {
         const std::string pyclass_name = std::string("ForceField") + TDOFType::Name();
-        py::class_<ForceField<TDOFType>, BaseObject, ForceField_Trampoline<TDOFType>, py_shared_ptr<ForceField<TDOFType>>> f(m, pyclass_name.c_str(), py::dynamic_attr(), py::multiple_inheritance(), sofapython3::doc::forceField::forceFieldClass);
+        py::class_<ForceField<TDOFType>, BaseComponent, ForceField_Trampoline<TDOFType>, py_shared_ptr<ForceField<TDOFType>>> f(m, pyclass_name.c_str(), py::dynamic_attr(), py::multiple_inheritance(), sofapython3::doc::forceField::forceFieldClass);
 
         f.def(py::init([](py::args &args, py::kwargs &kwargs) {
             auto ff = sofa::core::sptr<ForceField_Trampoline<TDOFType>> (new ForceField_Trampoline<TDOFType>());
