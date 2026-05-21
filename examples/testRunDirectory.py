@@ -26,8 +26,16 @@ def get_next_run_dir(base_dir="logs"):
     return run_dir
 
 # SCENE_DIR = "/home/lburel/Sofa/plugins/BeamAdapter/examples"
-# SCENE_DIR = "/home/lburel/Sofa/plugins/SofaPython3/examples"
-SCENE_DIR = "/home/lburel/Sofa/src/examples"
+SCENE_DIR = "/home/lburel/Sofa/plugins/SofaPython3/examples"
+# SCENE_DIR = "/home/lburel/Sofa/src/examples"
+
+# SCENE_DIR = "/home/lburel/Sofa/src/examples/Benchmark"
+# SCENE_DIR = "/home/lburel/Sofa/src/examples/Component"
+# SCENE_DIR = "/home/lburel/Sofa/src/examples/Demos"
+# SCENE_DIR = "/home/lburel/Sofa/src/examples/Objects"
+# SCENE_DIR = "/home/lburel/Sofa/src/examples/Tutorials"
+# SCENE_DIR = "/home/lburel/Sofa/src/examples/Validation"
+
 RUN_FEATURE = "/home/lburel/Sofa/plugins/SofaPython3/examples/LoaderScene_snapshot.py"
 MAX_WORKERS = 16
 TIMEOUT = 30
@@ -44,61 +52,57 @@ def safe_name(path):
 
 def run_scene(scene, log_dir):
     start = time.time()
-    cmd = ["python3",RUN_FEATURE, scene]
+    cmd = ["python3", RUN_FEATURE, scene]
 
     log_file = os.path.join(log_dir, safe_name(scene) + ".log")
 
-    try:
-        result = subprocess.run(
-            cmd,
-            stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE,
-            timeout=TIMEOUT
-        )
+    python_trace = None
 
-        stdout = result.stdout
-        stderr = result.stderr
-        code = result.returncode
-
-        python_trace = None
-
-    except subprocess.TimeoutExpired as e:
-        stdout = e.stdout or b""
-        stderr = e.stderr or b""
-        code = -999
-        python_trace = traceback.format_exc()
-
-    except Exception as e:
-        stdout = b""
-        stderr = str(e).encode()
-        code = -998
-        python_trace = traceback.format_exc()
-
-    duration = time.time() - start
-    # write the log after crash
+    # On ouvre le fichier log dès le début pour rediriger stdout/stderr
     with open(log_file, "wb") as f:
+        # Entête du log
         f.write(b"=== CMD ===\n")
         f.write(" ".join(cmd).encode() + b"\n\n")
+        f.flush()
 
-        f.write(b"=== RETURN CODE ===\n")
+        try:
+            # Redirection directe vers le fichier log
+            result = subprocess.run(
+                cmd,
+                stdout=f,
+                stderr=subprocess.STDOUT,
+                timeout=TIMEOUT
+            )
+            code = result.returncode
+
+        except subprocess.TimeoutExpired:
+            code = -999
+            python_trace = traceback.format_exc()
+
+        except Exception:
+            code = -998
+            python_trace = traceback.format_exc()
+
+        duration = time.time() - start
+
+        # Footer du log
+        f.write(b"\n=== RETURN CODE ===\n")
         f.write(str(code).encode() + b"\n\n")
-
-        f.write(b"=== STDOUT ===\n")
-        f.write(stdout + b"\n\n")
-
-        f.write(b"=== STDERR ===\n")
-        f.write(stderr + b"\n")
 
         if python_trace:
             f.write(b"=== PYTHON TRACEBACK ===\n")
-            f.write(python_trace.encode() + b"\n")
+            f.write(python_trace.encode() + b"\n\n")
 
         f.write(b"=== DURATION ===\n")
-        f.write(f"{duration:.2f} seconds\n\n".encode())
+        f.write(f"{duration:.2f} seconds\n".encode())
 
-    # status
+    # Détermination du statut
     if code == 0:
         status = "OK"
+    elif code == -999:
+        status = "TIMEOUT"
+    elif code == -998:
+        status = "PYTHON ERROR"
     elif code < 0:
         status = f"CRASH (signal {-code})"
     else:

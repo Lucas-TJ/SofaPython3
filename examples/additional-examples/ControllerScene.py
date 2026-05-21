@@ -3,9 +3,10 @@
 import Sofa.Core
 import Sofa.Simulation
 import SofaRuntime
+import Sofa.Gui
 import os
 
-_runAsPythonScript = False
+_runAsPythonScript = True
 
 
 class RotationController(Sofa.Core.Controller):
@@ -90,6 +91,12 @@ def createScene(root):
     root.name = 'root'
     root.gravity = [0.0, 9.8, 0.0]
 
+    root.addObject('RequiredPlugin', pluginName=['Sofa.Component.IO.Mesh',
+                                                'Sofa.Component.Engine.Transform',
+                                                 'Sofa.Component.StateContainer',
+                                                 'Sofa.GL.Component.Rendering3D',
+                                                 'Sofa.Component.Mapping.Linear'])
+
     loader = root.addObject('MeshOBJLoader', name='loader',
                             filename="mesh/liver.obj")
     te = root.addObject("TransformEngine", name="te",
@@ -108,8 +115,9 @@ def createScene(root):
 
 def main():
     # Load the required plugins
-    SofaRuntime.importPlugin("Sofa.GL.Component")
-    SofaRuntime.importPlugin("Sofa.Component")
+    # SofaRuntime.importPlugin("Sofa.GL.Component")
+    # SofaRuntime.importPlugin("Sofa.Component")
+    SofaRuntime.importPlugin("SofaImGui")
 
 
     # Check and save if the script is called from python environment
@@ -120,13 +128,20 @@ def main():
     root = Sofa.Core.Node()
     createScene(root)
     Sofa.Simulation.initRoot(root)
+    Sofa.Gui.GUIManager.Init("myscene", "imgui")
+    Sofa.Gui.GUIManager.createGUI(root, __file__)
+    Sofa.Gui.GUIManager.SetDimension(1080, 800)
+
+    Sofa.Gui.GUIManager.MainLoop(root)
+    Sofa.Gui.GUIManager.closeGUI()
+
 
     # Run simulation
-    for i in range(0, 360):
-        Sofa.Simulation.animate(root, root.dt.value)
-        root.te.rotation[0] += 1
-
-    print("Last value is : "+ str(root.te.rotation.value[0]))
+    # for i in range(0, 360):
+    #     Sofa.Simulation.animate(root, root.dt.value)
+    #     root.te.rotation[0] += 1
+    #
+    # print("Last value is : "+ str(root.te.rotation.value[0]))
 
 
 if __name__ == '__main__':

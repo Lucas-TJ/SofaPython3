@@ -107,6 +107,10 @@ def main(scene_file):
         print(scene_file)
         run_scn_scene(scene_file)
 
+    elif ext ==".xml":
+        print(scene_file)
+        run_scn_scene(scene_file)
+
 
     else:
         print("Unsupported file")
