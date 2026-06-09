@@ -26,7 +26,7 @@ def get_next_run_dir(base_dir="logs"):
     return run_dir
 
 # SCENE_DIR = "/home/lburel/Sofa/plugins/BeamAdapter/examples"
-SCENE_DIR = "/home/lburel/Sofa/plugins/SofaPython3/examples"
+# SCENE_DIR = "/home/lburel/Sofa/plugins/SofaPython3/examples"
 # SCENE_DIR = "/home/lburel/Sofa/src/examples"
 
 # SCENE_DIR = "/home/lburel/Sofa/src/examples/Benchmark"
@@ -36,7 +36,10 @@ SCENE_DIR = "/home/lburel/Sofa/plugins/SofaPython3/examples"
 # SCENE_DIR = "/home/lburel/Sofa/src/examples/Tutorials"
 # SCENE_DIR = "/home/lburel/Sofa/src/examples/Validation"
 
-RUN_FEATURE = "/home/lburel/Sofa/plugins/SofaPython3/examples/LoaderScene_snapshot.py"
+SCENE_DIR = "/home/lucasbureltojo/~Sofa/src/examples"
+
+# RUN_FEATURE = "/home/lburel/Sofa/plugins/SofaPython3/examples/LoaderScene_snapshot.py"
+RUN_FEATURE = "/home/lucasbureltojo/~Sofa/plugins/SofaPython3/examples/LoaderScene_snapshot.py"
 MAX_WORKERS = 16
 TIMEOUT = 30
 def find_scenes(root):
@@ -112,7 +115,7 @@ def run_scene(scene, log_dir):
 
 def main():
     start_time = time.time()
-    LOG_DIR = get_next_run_dir(base_dir="/home/lburel/logs")
+    LOG_DIR = get_next_run_dir(base_dir="/home/lucasbureltojo/logs")
     print(f" Logs for this run: {os.path.abspath(LOG_DIR)}")
     scenes = find_scenes(SCENE_DIR)
     print(f"{len(scenes)} scenes found\n")
