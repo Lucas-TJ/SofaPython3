@@ -24,7 +24,6 @@
 #include <sofa/core/objectmodel/Snapshot.h>
 using sofa::core::objectmodel::Snapshot;
 
-
 namespace sofapython3 {
 class Snapshot_Python
 {

@@ -19,18 +19,14 @@
 ******************************************************************************/
 
 #include "Binding_Snapshot.h"
-
 #include <pybind11/pybind11.h>
 #include <pybind11/pytypes.h>
-
-namespace py { using namespace pybind11; }
-
-
 #include <SofaPython3/Sofa/Core/Binding_Snapshot.h>
-
 #include <SofaPython3/PythonFactory.h>
 
 using sofa::core::objectmodel::Snapshot;
+
+namespace py { using namespace pybind11; }
 
 namespace sofapython3 {
 

@@ -27,27 +27,10 @@
 #include <sofa/core/ComponentNameHelper.h>
 
 #include <sofa/core/objectmodel/BaseComponent.h>
-
-#include "Binding_Snapshot.h"
 using sofa::core::objectmodel::BaseComponent;
 
 #include <sofa/core/objectmodel/BaseData.h>
 using sofa::core::objectmodel::BaseData;
-
-#include <sofa/core/objectmodel/Snapshot.h>
-using sofa::core::objectmodel::Snapshot;
-
-#include <sofa/core/objectmodel/SnapshotJSONExporter.h>
-
-#include <sofa/simulation/SaveSnapshotVisitor.h>
-using sofa::simulation::SaveSnapshotVisitor;
-
-#include <sofa/simulation/LoadSnapshotVisitor.h>
-using sofa::simulation::LoadSnapshotVisitor;
-
-
-#include <SofaPython3/Sofa/Core/Binding_Snapshot.h>
-using sofapython3::Snapshot_Python;
 
 #include <sofa/simpleapi/SimpleApi.h>
 namespace simpleapi = sofa::simpleapi;
@@ -85,6 +68,18 @@ using sofapython3::PythonEnvironment;
 #include <SofaPython3/SpellingSuggestionHelper.h>
 
 using sofa::core::objectmodel::BaseObjectDescription;
+
+#include <sofa/core/objectmodel/Snapshot.h>
+using sofa::core::objectmodel::Snapshot;
+
+#include <sofa/simulation/SaveSnapshotVisitor.h>
+using sofa::simulation::SaveSnapshotVisitor;
+
+#include <sofa/simulation/LoadSnapshotVisitor.h>
+using sofa::simulation::LoadSnapshotVisitor;
+
+#include <SofaPython3/Sofa/Core/Binding_Snapshot.h>
+using sofapython3::Snapshot_Python;
 
 #include <queue>
 #include <sofa/core/objectmodel/Link.h>
@@ -681,21 +676,16 @@ void sendEvent(Node* self, py::object pyUserData, char* eventName)
 void executeSaveSnapshotVisitor(Node* self, Snapshot_Python& snapshot)
 {
     auto m_snapshot = std::make_shared<sofa::core::objectmodel::Snapshot>();
-
     auto visitor = SaveSnapshotVisitor(nullptr,*m_snapshot);
     self->execute(visitor);
-
     snapshot.push_back(m_snapshot);
-
 }
 
 void executeLoadSnapshotVisitor(Node* self, Snapshot_Python& snapshot, sofa::Index index)
 {
     auto m_loadedsnapshot = std::make_shared<sofa::core::objectmodel::Snapshot>();
-
     auto visitor = LoadSnapshotVisitor(nullptr,*snapshot.m_snapshots[index]);
     self->execute(visitor);
-
 }
 
 py::object computeEnergy(Node* self)
@@ -763,14 +753,6 @@ void moduleAddNode(py::module &m) {
     p.def("getMechanicalMapping", &getMechanicalMapping, sofapython3::doc::sofa::core::Node::getMechanicalMapping);
     p.def("sendEvent", &sendEvent, sofapython3::doc::sofa::core::Node::sendEvent);
     p.def("computeEnergy", &computeEnergy, sofapython3::doc::sofa::core::Node::computeEnergy);
-
-    p.def("saveSnapshot",
-    [](Node& self, std::vector<std::shared_ptr<Snapshot::SnapshotNode>>& nodes)
-    {
-        Base& base = self;  // cast explicite
-        return base.saveSnapshot(nodes);
-    });
-
     p.def("executeSaveSnapshotVisitor", &executeSaveSnapshotVisitor);
     p.def("executeLoadSnapshotVisitor", &executeLoadSnapshotVisitor);
 
