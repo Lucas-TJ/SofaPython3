@@ -1,6 +1,6 @@
 /******************************************************************************
-*                              SofaPython3 plugin                             *
-*                  (c) 2021 CNRS, University of Lille, INRIA                  *
+*                 SOFA, Simulation Open-Framework Architecture                *
+*                    (c) 2021 INRIA, USTL, UJF, CNRS, MGH                     *
 *                                                                             *
 * This program is free software; you can redistribute it and/or modify it     *
 * under the terms of the GNU Lesser General Public License as published by    *
@@ -18,18 +18,13 @@
 * Contact information: contact@sofa-framework.org                             *
 ******************************************************************************/
 
-#include <sofa/core/objectmodel/Context.h>
-#include <SofaPython3/Sofa/Core/Binding_Base.h>
-#include <SofaPython3/Sofa/Core/Binding_BaseContext.h>
-#include <SofaPython3/Sofa/Core/Binding_Context.h>
+#pragma once
 
-using namespace sofa::core::objectmodel;
-namespace py { using namespace pybind11; }
+#include <pybind11/pybind11.h>
 
-namespace sofapython3 {
+namespace sofapython3
+{
 
-void moduleAddContext(py::module& m) {
-    py::class_<Context, BaseContext, py_shared_ptr<Context>> (m, "Context", "Implementation of BaseContext, storing all shared parameters in Datas");
-}
+void moduleAddLameParameters(pybind11::module& m);
 
 } // namespace sofapython3

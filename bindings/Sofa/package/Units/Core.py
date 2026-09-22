@@ -1,8 +1,8 @@
 import math
 
 class Unit():
-    numerator : list
-    denumerator : list
+    numerator : tuple
+    denumerator : tuple
     ratio : float
 
 
@@ -98,8 +98,8 @@ class Unit():
 
 class NeutralUnit(Unit):
     def __init__(self):
-        self.numerator = []
-        self.denumerator = []
+        self.numerator = ()
+        self.denumerator = ()
         self.ratio = 1.0
         
     def __str__(self):
@@ -112,17 +112,17 @@ class PrimaryUnit(Unit):
 
     def __init__(self, abrev : str):
         self.abrev = abrev
-        self.numerator = [self]
-        self.denumerator = []
+        self.numerator = (self,)
+        self.denumerator = ()
         self.ratio = 1.0
 
 
 
 class DerivedUnit(Unit):
 
-    def __init__(self, numerator : list[PrimaryUnit], denumerator : list[PrimaryUnit], ratio : float):
-        self.numerator = numerator  
-        self.denumerator = denumerator  
+    def __init__(self, numerator : tuple[PrimaryUnit], denumerator : tuple[PrimaryUnit], ratio : float):
+        self.numerator = tuple(numerator)
+        self.denumerator = tuple(denumerator)
         self.ratio = ratio
 
         self.simplify()
@@ -130,24 +130,28 @@ class DerivedUnit(Unit):
 
     def simplify(self):
         futNum = []
+        denum = list(self.denumerator)
         for unit in self.numerator:
             simplified = False
-            for i in range(len(self.denumerator)):
-                if self.denumerator[i].abrev == unit.abrev:
+            for i in range(len(denum)):
+                if denum[i].abrev == unit.abrev:
                     simplified = True
-                    self.denumerator.pop(i)
+                    denum.pop(i)
                     break
             if not(simplified):
                 futNum.append(unit)
-        self.numerator = futNum
+        self.numerator = tuple(futNum)
+        self.denumerator = tuple(denum)
         
 
 class ScaledUnit(Unit):
 
     def __init__(self, unit : Unit, ratio : float):
-        self.numerator = unit.numerator.copy()
-        self.denumerator = unit.denumerator.copy()
+        self.numerator = tuple(unit.numerator)
+        self.denumerator = tuple(unit.denumerator)
         self.ratio = ratio
+        if hasattr(unit, "ratio"):
+             self.ratio *= unit.ratio
 
 
 class DimensionnedValue():

@@ -10,9 +10,9 @@ Run with:  pytest test_units.py -v
 import math
 import pytest
 
-from Definitions import (
+from Units.Definitions import (
     DimensionLess, m, s, kg,
-    v, a, N, Pa, tho,
+    v, a, N, Pa, tau,
     nm, mm, cm, km,
     ms, µs,
     g, mg, t,
@@ -20,7 +20,7 @@ from Definitions import (
     kPa, MPa,
 )
 
-from Core import (
+from Units.Core import (
     Unit, NeutralUnit, PrimaryUnit, DerivedUnit, ScaledUnit, DimensionnedValue
 )
 
@@ -36,8 +36,8 @@ class TestPrimaryUnit:
         assert kg.abrev == "kg"
 
     def test_primary_unit_is_its_own_numerator(self):
-        assert m.numerator == [m]
-        assert m.denumerator == []
+        assert m.numerator == (m,)
+        assert m.denumerator == ()
 
     def test_primary_unit_ratio_is_one(self):
         assert m.ratio == 1.0
@@ -45,15 +45,15 @@ class TestPrimaryUnit:
     def test_new_primary_unit_construction(self):
         x = PrimaryUnit("x")
         assert x.abrev == "x"
-        assert x.numerator == [x]
-        assert x.denumerator == []
+        assert x.numerator == (x,)
+        assert x.denumerator == ()
         assert x.ratio == 1.0
 
 
 class TestNeutralUnit:
     def test_neutral_unit_has_no_num_or_denum(self):
-        assert DimensionLess.numerator == []
-        assert DimensionLess.denumerator == []
+        assert DimensionLess.numerator == ()
+        assert DimensionLess.denumerator == ()
 
     def test_neutral_unit_ratio_is_one(self):
         assert DimensionLess.ratio == 1.0
@@ -62,7 +62,7 @@ class TestNeutralUnit:
         result = DimensionLess * m
         assert result.ratio == 1.0
         assert [u.abrev for u in result.numerator] == ["m"]
-        assert result.denumerator == []
+        assert result.denumerator == ()
 
 
 # ---------------------------------------------------------------------------
@@ -102,7 +102,7 @@ class TestMultiplication:
         result = m * m
         assert isinstance(result, DerivedUnit)
         assert [u.abrev for u in result.numerator] == ["m", "m"]
-        assert result.denumerator == []
+        assert result.denumerator == ()
         assert result.ratio == 1.0
 
     def test_multiply_combines_ratios(self):
@@ -139,15 +139,15 @@ class TestSimplify:
     def test_simplify_cancels_matching_units(self):
         # (m/s) * (s/m) should fully cancel to a dimensionless unit
         result = (m / s) * (s / m)
-        assert result.numerator == []
-        assert result.denumerator == []
+        assert result.numerator == ()
+        assert result.denumerator == ()
         assert result.ratio == 1.0
 
     def test_simplify_cancels_only_one_occurrence(self):
         # (m*m) / m -> should cancel exactly one 'm', leaving one 'm' in numerator
         result = (m * m) / m
         assert [u.abrev for u in result.numerator] == ["m"]
-        assert result.denumerator == []
+        assert result.denumerator == ()
 
     def test_simplify_does_not_cancel_unmatched_units(self):
         # N has kg (no matching denum) and m (no matching denum); s^2 in
@@ -169,14 +169,19 @@ class TestScaledUnit:
 
     def test_scaled_unit_keeps_base_unit_dimension(self):
         assert [u.abrev for u in mm.numerator] == ["m"]
-        assert mm.denumerator == []
+        assert mm.denumerator == ()
         assert [u.abrev for u in kN.numerator] == ["kg", "m"]
         assert [u.abrev for u in kN.denumerator] == ["s", "s"]
 
-    def test_scaled_unit_doesnt_shares_list_reference_with_base_unit(self):
-        assert mm.numerator is not m.numerator
-        assert kN.numerator is not N.numerator
-        assert kN.denumerator is not N.denumerator
+    def test_scaled_unit_shares_immutable_dimension_with_base_unit(self):
+        # numerator/denumerator are tuples (immutable), so ScaledUnit can
+        # safely share the base unit's objects - there is no longer any risk
+        # of one mutating the other, so a defensive copy is unnecessary.
+        assert isinstance(mm.numerator, tuple)
+        assert isinstance(kN.denumerator, tuple)
+        assert mm.numerator == m.numerator
+        assert kN.numerator == N.numerator
+        assert kN.denumerator == N.denumerator
 
 
 # ---------------------------------------------------------------------------
@@ -356,14 +361,14 @@ class TestScaledUnitComposition:
 
 
 class TestSimplifyMutation:
-    def test_constructor_mutates_callers_denominator_list(self):
-        # BUG/quirk: DerivedUnit.simplify() pops from the very list object
-        # the caller passed in, so the caller's list is emptied as a side
-        # effect. The operators (*, /, **) always build fresh lists so they
-        # are unaffected, but direct construction is not safe.
+    def test_constructor_does_not_mutate_callers_lists(self):
+        # FIXED: DerivedUnit copies its arguments into tuples, so simplify()
+        # works on internal copies only. Constructing a unit no longer empties
+        # the caller's lists as a side effect.
         num, den = [m], [m]
         DerivedUnit(numerator=num, denumerator=den, ratio=1.0)
-        assert den == []  # caller's list was mutated in place
+        assert num == [m]
+        assert den == [m]  # caller's list is left intact
 
 
 # ---------------------------------------------------------------------------
