@@ -78,6 +78,30 @@ std::string Controller_Trampoline::getClassName() const
 {
     return trampoline_getClassName();
 }
+void Controller_Trampoline::saveInternalStateIn(sofa::core::objectmodel::Snapshot::SnapshotObject &snapshot) const
+{
+    pybind11::gil_scoped_acquire acquire;
+    pybind11::object overload = pybind11::get_overload(this, "saveInternalStateIn");
+
+    if (overload) {
+        overload(&snapshot);
+    } else {
+        sofapython3::Controller::saveInternalStateIn(snapshot);
+    }
+}
+
+void Controller_Trampoline::loadInternalStateFrom(const sofa::core::objectmodel::Snapshot::SnapshotObject &snapshot)
+{
+    pybind11::gil_scoped_acquire acquire;
+    pybind11::object overload = pybind11::get_overload(this, "loadInternalStateFrom");
+
+    if (overload) {
+        overload(&snapshot);
+    } else {
+        sofapython3::Controller::loadInternalStateFrom(snapshot);
+    }
+
+}
 
 // ---------------------------------------------------------------------------
 // Module registration

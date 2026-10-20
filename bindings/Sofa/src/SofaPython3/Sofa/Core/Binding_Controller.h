@@ -50,6 +50,9 @@ public:
     void draw(const sofa::core::visual::VisualParams* params) override;
     void handleEvent(sofa::core::objectmodel::Event* event) override;
     std::string getClassName() const override;
+    void saveInternalStateIn(sofa::core::objectmodel::Snapshot::SnapshotObject &snapshot) const override;
+
+    void loadInternalStateFrom(const sofa::core::objectmodel::Snapshot::SnapshotObject &snapshot) override;
 };
 
 void moduleAddController(pybind11::module &m);
