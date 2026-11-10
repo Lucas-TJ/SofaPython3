@@ -78,8 +78,8 @@ using sofa::simulation::SaveSnapshotVisitor;
 #include <sofa/simulation/LoadSnapshotVisitor.h>
 using sofa::simulation::LoadSnapshotVisitor;
 
-#include <SofaPython3/Sofa/Core/Binding_Snapshot.h>
-using sofapython3::Snapshot_Python;
+#include <sofa/simulation/SnapshotManager.h>
+using sofa::simulation::SnapshotManager;
 
 #include <queue>
 #include <sofa/core/objectmodel/Link.h>
@@ -673,19 +673,36 @@ void sendEvent(Node* self, py::object pyUserData, char* eventName)
     self->propagateEvent(sofa::core::execparams::defaultInstance(), &event);
 }
 
-void executeSaveSnapshotVisitor(Node* self, Snapshot_Python& snapshot)
+void executeSaveSnapshotVisitor(Node* self, Snapshot& snapshot)
 {
-    auto m_snapshot = std::make_shared<sofa::core::objectmodel::Snapshot>();
-    auto visitor = SaveSnapshotVisitor(nullptr,*m_snapshot);
+    auto visitor = SaveSnapshotVisitor(nullptr,snapshot);
     self->execute(visitor);
-    snapshot.push_back(m_snapshot);
 }
 
-void executeLoadSnapshotVisitor(Node* self, Snapshot_Python& snapshot, sofa::Index index)
+void executeLoadSnapshotVisitor(Node* self, Snapshot& snapshot)
 {
-    auto m_loadedsnapshot = std::make_shared<sofa::core::objectmodel::Snapshot>();
-    auto visitor = LoadSnapshotVisitor(nullptr,*snapshot.m_snapshots[index]);
+    auto visitor = LoadSnapshotVisitor(nullptr,snapshot);
     self->execute(visitor);
+}
+
+void executeMemorySave(Node* self, BaseComponent& object)
+{
+    auto* manager = dynamic_cast<SnapshotManager*>(&object);
+
+    if (manager)
+        manager->memorySave(self);
+    else
+        throw py::type_error("Expected a SnapshotManager");
+}
+
+void executeMemoryLoad(sofa::core::sptr<Node>& self, BaseComponent& object)
+{
+    auto* manager = dynamic_cast<SnapshotManager*>(&object);
+
+    if (manager)
+        manager->memoryLoad(self);
+    else
+        throw py::type_error("Expected a SnapshotManager");
 }
 
 py::object computeEnergy(Node* self)
@@ -755,6 +772,8 @@ void moduleAddNode(py::module &m) {
     p.def("computeEnergy", &computeEnergy, sofapython3::doc::sofa::core::Node::computeEnergy);
     p.def("executeSaveSnapshotVisitor", &executeSaveSnapshotVisitor);
     p.def("executeLoadSnapshotVisitor", &executeLoadSnapshotVisitor);
+    p.def("executeMemorySave", &executeMemorySave);
+    p.def("executeMemoryLoad", &executeMemoryLoad);
 
     p.def("__enter__", [](py::object self)
     {

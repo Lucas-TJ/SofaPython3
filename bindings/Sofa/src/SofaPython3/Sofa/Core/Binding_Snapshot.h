@@ -1,6 +1,6 @@
 /******************************************************************************
-*                 SOFA, Simulation Open-Framework Architecture                *
-*                    (c) 2021 INRIA, USTL, UJF, CNRS, MGH                     *
+*                              SofaPython3 plugin                             *
+*                  (c) 2021 CNRS, University of Lille, INRIA                  *
 *                                                                             *
 * This program is free software; you can redistribute it and/or modify it     *
 * under the terms of the GNU Lesser General Public License as published by    *
@@ -25,23 +25,6 @@
 using sofa::core::objectmodel::Snapshot;
 
 namespace sofapython3 {
-class Snapshot_Python
-{
-public :
-    std::vector<std::shared_ptr<Snapshot>> m_snapshots;
-
-    Snapshot_Python() = default;
-    ~Snapshot_Python() = default;
-
-    void push_back(const std::shared_ptr<Snapshot>& snapshot) {
-        m_snapshots.push_back(snapshot);
-    }
-
-    int getNumberOfSnapshot() const {
-        return m_snapshots.size();
-    }
-
-};
 
 void moduleAddSnapshot(pybind11::module &m);
 
