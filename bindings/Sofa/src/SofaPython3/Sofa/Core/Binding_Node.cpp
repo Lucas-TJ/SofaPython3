@@ -690,17 +690,17 @@ void executeMemorySave(Node* self, BaseComponent& object)
     auto* manager = dynamic_cast<SnapshotManager*>(&object);
 
     if (manager)
-        manager->memorySave(self);
+        manager->memorySave();
     else
         throw py::type_error("Expected a SnapshotManager");
 }
 
-void executeMemoryLoad(sofa::core::sptr<Node>& self, BaseComponent& object)
+void executeMemoryLoad(BaseComponent& object)
 {
     auto* manager = dynamic_cast<SnapshotManager*>(&object);
 
     if (manager)
-        manager->memoryLoad(self);
+        manager->memoryLoad();
     else
         throw py::type_error("Expected a SnapshotManager");
 }
